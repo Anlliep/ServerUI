@@ -1,0 +1,20 @@
+﻿cmake_minimum_required(VERSION 3.0.0)
+project(ServerUI VERSION 0.1.0) 
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_HOME_DIRECTORY}/build)
+set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
+
+set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${CMAKE_HOME_DIRECTORY}/build)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_HOME_DIRECTORY}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_HOME_DIRECTORY}/bin)
+
+include(${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/conanbuildinfo.cmake)
+conan_basic_setup()
+
+add_subdirectory(src)
+
+message([Main] "${CONAN_LIBS}**********************************************")
