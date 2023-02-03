@@ -1,7 +1,18 @@
 ﻿cmake_minimum_required(VERSION 3.0.0)
-project(ServerUI VERSION 0.1.0) 
+project(ServerUI VERSION 0.1.0)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+# We do not need C++20 in future, might disable it as well
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
+
+set(SERVER_UI ServerUI)
+
+set(PROJECT_INCLUDE_DIR ${CMAKE_HOME_DIRECTORY}/include)
+set(PROJECT_SOURCE_DIR ${CMAKE_HOME_DIRECTORY}/src)
+set(PROJECT_BINDINGS ${CMAKE_HOME_DIRECTORY}/bindings)
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_HOME_DIRECTORY}/build)
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
@@ -12,9 +23,20 @@ set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${CMAKE_HOME_DIRECTORY}/build)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_HOME_DIRECTORY}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_HOME_DIRECTORY}/bin)
 
+
+file(GLOB_RECURSE SOURCE_FILES ${PROJECT_SOURCE_DIR}/*.cpp)
+file(GLOB_RECURSE BINDINGS_SOURCE_FILES ${PROJECT_BINDINGS}/*.cpp)
+
+include_directories(${PROJECT_INCLUDE_DIR})
+include_directories(${PROJECT_SOURCE_DIR})
+include_directories(${PROJECT_BINDINGS})
+
 include(${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/conanbuildinfo.cmake)
 conan_basic_setup()
 
-add_subdirectory(src)
+add_executable(${SERVER_UI} ${SOURCE_FILES} ${BINDINGS_SOURCE_FILES})
+target_include_directories(${SERVER_UI} PUBLIC ${PROJECT_INCLUDE_DIR})
+target_include_directories(${SERVER_UI} PUBLIC ${PROJECT_BINDINGS})
+target_link_libraries(${SERVER_UI} ${CONAN_LIBS})
 
 message([Main] "${CONAN_LIBS}**********************************************")
