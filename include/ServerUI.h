@@ -1,26 +1,22 @@
 ﻿#pragma once
 #include <stdio.h>
-#include "menu.h"
+
+#include <ctime>
 #include <iostream>
+#include <string>
+#include <vector>
 
 #include "../bindings/imgui_impl_glfw.h"
 #include "../bindings/imgui_impl_opengl3.h"
-#include "Poco/Net/HTTPClientSession.h"
-#include "Poco/Net/HTTPMessage.h"
-#include "Poco/Net/HTTPRequest.h"
-#include "Poco/Net/HTTPResponse.h"
-#include "Poco/StreamCopier.h"
-#include "Poco/URI.h"
 #include "imgui.h"
+#include "imguipp.h"
+#include "icons.h"
+#include "serverRequests.h"
 #define GL_SILENCE_DEPRECATION
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
 #endif
 #include <GLFW/glfw3.h>  // Will drag system OpenGL headers
-
-#include <ctime>
-#include <string>
-#include <vector>
 
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to
 // maximize ease of testing and compatibility with old VS compilers. To link
@@ -36,6 +32,11 @@
 static void glfw_error_callback(int error, const char* description) {
   fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
+
+namespace settings {
+static int Tab = 0;
+}  // namespace settings
+
 template <typename Derived>
 class UI {
  public:
@@ -68,7 +69,7 @@ class UI {
 #endif
 
     // Create window with graphics context
-    window = glfwCreateWindow(720, 480, "SERVER", NULL, NULL);
+    window = glfwCreateWindow(1000, 720, "SERVER", NULL, NULL);
     if (window == NULL) std::exit(1);
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);  // Enable vsync
@@ -78,6 +79,21 @@ class UI {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
     (void)io;
+
+    // your fonts here
+    io.Fonts->AddFontDefault();
+    // fonts end
+
+    // your icons here
+    ImFontConfig config;
+    config.MergeMode = true;
+    config.GlyphMinAdvanceX =
+        13.0f;  // Use if you want to make the icon monospaced
+    static const ImWchar icon_ranges[] = {ICON_MIN_FA, ICON_MAX_FA, 0};
+    io.Fonts->AddFontFromFileTTF("../fonts/fontawesome-webfont.ttf", 13.0f,
+                                 &config, icon_ranges);
+    // icons end
+
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable
     // Keyboard Controls io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; //
     // Enable Gamepad Controls
@@ -174,141 +190,19 @@ class UI {
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 };
 
-using namespace Poco;
-using namespace Poco::Net;
-
 class myUI : public UI<myUI> {
  public:
   myUI() {}
   ~myUI() = default;
   void StartUp() {}
 
-  void DrawRowsBackground(int row_count, float line_height, float x1, float x2,
-                          float y_offset, ImU32 col_even, ImU32 col_odd) {
-    ImDrawList* draw_list = ImGui::GetWindowDrawList();
-    float y0 = ImGui::GetCursorScreenPos().y + (float)(int)y_offset;
+  void Update();
 
-    int row_display_start;
-    int row_display_end;
-    ImGui::CalcListClipping(row_count, line_height, &row_display_start,
-                            &row_display_end);
-    for (int row_n = row_display_start; row_n < row_display_end; row_n++) {
-      ImU32 col = (row_n & 1) ? col_odd : col_even;
-      if ((col & IM_COL32_A_MASK) == 0) continue;
-      float y1 = y0 + (line_height * row_n);
-      float y2 = y1 + line_height;
-      draw_list->AddRectFilled(ImVec2(x1, y1), ImVec2(x2, y2), col);
-    }
-  }
+  void SetMenuTheme();
+  void RenderMenu();
+  void SetLogs() { logs = connection::GetLogs(); }
+  void ClearLogs() { logs.clear(); }
 
-  void Update() {
-  
-  Menu::Theme();
-    {
-      ImGui::Begin("ServerUI", 0,
-                   ImGuiWindowFlags_NoScrollbar |
-                       ImGuiWindowFlags_NoScrollWithMouse |
-                       ImGuiWindowFlags_NoResize);
-      { Menu::Render(); }
-      ImGui::End();
-    }
-    ImGui::EndFrame();
-  
-  }
-    /*
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(ImColor(224, 255, 255)));
-    ImGui::Begin("Settings", 0);
-    ImGui::PopStyleColor();
-    if (isServerRunning) {
-      ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(ImColor(255, 255, 255)));
-      ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(ImColor(0, 255, 0)));
-      ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(ImColor(0, 255, 0)));
-      ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(ImColor(0, 255, 0)));
-    } else {
-      ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(ImColor(0, 0, 0)));
-      ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(ImColor(255, 0, 0)));
-      ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(ImColor(255, 0, 0)));
-      ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(ImColor(255, 0, 0)));
-    }
-
-
-    if (ImGui::Button("Run Server")) {
-      /* isServerRunning = !isServerRunning;
-        now = time(0);
-        dt = ctime(&now);
-        if (isServerRunning)
-          logs.push_back(dt + "The server has started.\n");
-        else
-          logs.push_back(dt + "The server has stopped.\n");
-  }
-
-  ImGui::PopStyleColor(4);
-
-  ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(ImColor(0, 0, 0)));
-  ImGui::Text("Logs information:");
-  ImGui::PopStyleColor();
-  if (ImGui::Button("GetLogs")) {
-    Func();
-  }
-  if (ImGui::BeginListBox("Logs information:", ImVec2(0, 0))) {
-    for (int i = 0; i < logs.size(); ++i) {
-      const bool isSelected = (selectedIndex == i);
-
-      if (ImGui::Selectable(logs[i].c_str(), isSelected)) {
-        selectedIndex = i;
-      }
-      /*float x1 = ImGui::GetWindowContentRegionMin().x;
-      float x2 = ImGui::GetWindowContentRegionMax().x;
-      float item_spacing_y = ImGui::GetStyle().ItemSpacing.y;
-      float item_offset_y = -item_spacing_y * 0.5f;
-      float line_height = ImGui::GetTextLineHeight() + item_spacing_y;
-      DrawRowsBackground(logs.size() - 1, line_height, x1, x2, item_offset_y,
-      0, ImGui::GetColorU32(ImVec4(0.4f, 0.4f, 0.4f, 0.5f)));
-      // Set the initial focus when opening the combo
-      // (scrolling + keyboard navigation focus)
-      if (isSelected) {
-        ImGui::SetItemDefaultFocus();
-      }
-    }
-    ImGui::EndListBox();
-  }
-  ImGui::End();
-}
-*/
-
-    void Func() {
-  URI uri("http://15.188.57.7:8080");
-  HTTPClientSession session(uri.getHost(), uri.getPort());
-  std::string path = "/logs";
-
-  session.setKeepAliveTimeout(true);
-
-  HTTPRequest request(HTTPRequest::HTTP_GET, path, HTTPMessage::HTTP_1_1);
-
-  session.sendRequest(request);
-
-  HTTPResponse response;
-
-  std::istream& page = session.receiveResponse(response);
-
-  std::string line{};
-  std::string number{};
-  while (std::getline(page, line)) {
-    std::stringstream strStream(line);
-    while (std::getline(strStream, number, ',')) {
-      logs.push_back(number);
-    }
-  }
-}
-
-private:
-bool show_demo_window = true;
-bool show_another_window = false;
-bool isServerRunning = false;
-std::vector<std::string> logs;
-int selectedIndex = 0;
-
-time_t now;
-std::string dt;
-}
-;
+ private:
+  std::vector<std::string> logs;
+};
