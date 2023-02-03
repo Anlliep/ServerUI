@@ -9,7 +9,6 @@ set(SOURCE_FILES
 	imguipp.h
 	imguipp.cpp
 	icons.h
-	
 	../bindings/imgui_impl_glfw.cpp
 	../bindings/imgui_impl_opengl3.cpp
 	../bindings/imgui_impl_glfw.h
