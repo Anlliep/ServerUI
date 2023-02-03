@@ -1,10 +1,16 @@
 ﻿#pragma once
 #include <stdio.h>
-
+#include "menu.h"
 #include <iostream>
 
 #include "../bindings/imgui_impl_glfw.h"
 #include "../bindings/imgui_impl_opengl3.h"
+#include "Poco/Net/HTTPClientSession.h"
+#include "Poco/Net/HTTPMessage.h"
+#include "Poco/Net/HTTPRequest.h"
+#include "Poco/Net/HTTPResponse.h"
+#include "Poco/StreamCopier.h"
+#include "Poco/URI.h"
 #include "imgui.h"
 #define GL_SILENCE_DEPRECATION
 #if defined(IMGUI_IMPL_OPENGL_ES2)
@@ -168,12 +174,14 @@ class UI {
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 };
 
+using namespace Poco;
+using namespace Poco::Net;
+
 class myUI : public UI<myUI> {
  public:
   myUI() {}
   ~myUI() = default;
-
-  void StartUp();
+  void StartUp() {}
 
   void DrawRowsBackground(int row_count, float line_height, float x1, float x2,
                           float y_offset, ImU32 col_even, ImU32 col_odd) {
@@ -194,10 +202,23 @@ class myUI : public UI<myUI> {
   }
 
   void Update() {
+  
+  Menu::Theme();
+    {
+      ImGui::Begin("ServerUI", 0,
+                   ImGuiWindowFlags_NoScrollbar |
+                       ImGuiWindowFlags_NoScrollWithMouse |
+                       ImGuiWindowFlags_NoResize);
+      { Menu::Render(); }
+      ImGui::End();
+    }
+    ImGui::EndFrame();
+  
+  }
+    /*
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(ImColor(224, 255, 255)));
     ImGui::Begin("Settings", 0);
     ImGui::PopStyleColor();
-
     if (isServerRunning) {
       ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(ImColor(255, 255, 255)));
       ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(ImColor(0, 255, 0)));
@@ -210,54 +231,84 @@ class myUI : public UI<myUI> {
       ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(ImColor(255, 0, 0)));
     }
 
+
     if (ImGui::Button("Run Server")) {
-      isServerRunning = !isServerRunning;
-      now = time(0);
-      dt = ctime(&now);
-      if (isServerRunning)
-        logs.push_back(dt + "The server has started.\n");
-      else
-        logs.push_back(dt + "The server has stopped.\n");
-    }
-
-    ImGui::PopStyleColor(4);
-
-    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(ImColor(0, 0, 0)));
-    ImGui::Text("Logs information:");
-    ImGui::PopStyleColor();
-
-    if (ImGui::BeginListBox("Logs information:", ImVec2(200, 150))) {
-      for (int i = 0; i < logs.size(); ++i) {
-        const bool isSelected = (selectedIndex == i);
-
-        if (ImGui::Selectable(logs[i].c_str(), isSelected)) {
-          selectedIndex = i;
-        }
-        /*float x1 = ImGui::GetWindowContentRegionMin().x;
-        float x2 = ImGui::GetWindowContentRegionMax().x;
-        float item_spacing_y = ImGui::GetStyle().ItemSpacing.y;
-        float item_offset_y = -item_spacing_y * 0.5f;
-        float line_height = ImGui::GetTextLineHeight() + item_spacing_y;
-        DrawRowsBackground(logs.size() - 1, line_height, x1, x2, item_offset_y,
-        0, ImGui::GetColorU32(ImVec4(0.4f, 0.4f, 0.4f, 0.5f)));*/
-        // Set the initial focus when opening the combo
-        // (scrolling + keyboard navigation focus)
-        if (isSelected) {
-          ImGui::SetItemDefaultFocus();
-        }
-      }
-      ImGui::EndListBox();
-    }
+      /* isServerRunning = !isServerRunning;
+        now = time(0);
+        dt = ctime(&now);
+        if (isServerRunning)
+          logs.push_back(dt + "The server has started.\n");
+        else
+          logs.push_back(dt + "The server has stopped.\n");
   }
 
- private:
-  bool show_demo_window = true;
-  bool show_another_window = false;
-  bool isServerRunning = false;
+  ImGui::PopStyleColor(4);
 
-  std::vector<std::string> logs;
-  int selectedIndex = 0;
+  ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(ImColor(0, 0, 0)));
+  ImGui::Text("Logs information:");
+  ImGui::PopStyleColor();
+  if (ImGui::Button("GetLogs")) {
+    Func();
+  }
+  if (ImGui::BeginListBox("Logs information:", ImVec2(0, 0))) {
+    for (int i = 0; i < logs.size(); ++i) {
+      const bool isSelected = (selectedIndex == i);
 
-  time_t now;
-  std::string dt;
-};
+      if (ImGui::Selectable(logs[i].c_str(), isSelected)) {
+        selectedIndex = i;
+      }
+      /*float x1 = ImGui::GetWindowContentRegionMin().x;
+      float x2 = ImGui::GetWindowContentRegionMax().x;
+      float item_spacing_y = ImGui::GetStyle().ItemSpacing.y;
+      float item_offset_y = -item_spacing_y * 0.5f;
+      float line_height = ImGui::GetTextLineHeight() + item_spacing_y;
+      DrawRowsBackground(logs.size() - 1, line_height, x1, x2, item_offset_y,
+      0, ImGui::GetColorU32(ImVec4(0.4f, 0.4f, 0.4f, 0.5f)));
+      // Set the initial focus when opening the combo
+      // (scrolling + keyboard navigation focus)
+      if (isSelected) {
+        ImGui::SetItemDefaultFocus();
+      }
+    }
+    ImGui::EndListBox();
+  }
+  ImGui::End();
+}
+*/
+
+    void Func() {
+  URI uri("http://15.188.57.7:8080");
+  HTTPClientSession session(uri.getHost(), uri.getPort());
+  std::string path = "/logs";
+
+  session.setKeepAliveTimeout(true);
+
+  HTTPRequest request(HTTPRequest::HTTP_GET, path, HTTPMessage::HTTP_1_1);
+
+  session.sendRequest(request);
+
+  HTTPResponse response;
+
+  std::istream& page = session.receiveResponse(response);
+
+  std::string line{};
+  std::string number{};
+  while (std::getline(page, line)) {
+    std::stringstream strStream(line);
+    while (std::getline(strStream, number, ',')) {
+      logs.push_back(number);
+    }
+  }
+}
+
+private:
+bool show_demo_window = true;
+bool show_another_window = false;
+bool isServerRunning = false;
+std::vector<std::string> logs;
+int selectedIndex = 0;
+
+time_t now;
+std::string dt;
+}
+;

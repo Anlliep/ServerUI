@@ -3,7 +3,13 @@
 set(SOURCE_FILES
 	Main.cpp
 	ServerUI.h
-	ServerUI.cpp
+	menu.h
+	menu.cpp
+	icons.h
+	iconcpp.h
+	settings.h
+	imguipp.h
+	imguipp.cpp
 	../bindings/imgui_impl_glfw.cpp
 	../bindings/imgui_impl_opengl3.cpp
 	../bindings/imgui_impl_glfw.h
