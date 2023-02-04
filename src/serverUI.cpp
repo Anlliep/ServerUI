@@ -1,14 +1,14 @@
 ﻿#pragma once
 #include "serverUI.h"
- 
+
 void myUI::Update() {
   SetMenuTheme();
-  ImGui::Begin("ServerUI", 0,
+  ImGui::Begin("Smart house", 0,
                ImGuiWindowFlags_NoScrollbar |
                    ImGuiWindowFlags_NoScrollWithMouse |
                    ImGuiWindowFlags_NoResize);
 
-  RenderMenu();  // rendering main window
+  RenderMenu();
 
   ImGui::End();
   ImGui::EndFrame();
@@ -50,7 +50,6 @@ void myUI::RenderMenu() {
 
   {
     // Left side
-
     static ImVec4 active = imguipp::to_vec4(41, 40, 41, 255);
     static ImVec4 inactive = imguipp::to_vec4(31, 30, 31, 255);
 
@@ -60,37 +59,35 @@ void myUI::RenderMenu() {
                       ImVec2(230 - 15, 41)))
       settings::Tab = 1;
 
-    ImGui::Spacing();
+    /*ImGui::Spacing();
     ImGui::PushStyleColor(ImGuiCol_Button,
                           settings::Tab == 2 ? active : inactive);
     if (ImGui::Button(ICON_FA_USERS " Users", ImVec2(230 - 15, 41)))
-      settings::Tab = 2;
+      settings::Tab = 2;*/
 
     ImGui::Spacing();
     ImGui::PushStyleColor(ImGuiCol_Button,
                           settings::Tab == 3 ? active : inactive);
     if (ImGui::Button(ICON_FA_CODE " Logs", ImVec2(230 - 15, 41)))
-      settings::Tab = 3;
+      settings::Tab = 2;
 
     ImGui::Spacing();
     ImGui::PushStyleColor(ImGuiCol_Button,
                           settings::Tab == 4 ? active : inactive);
     if (ImGui::Button(ICON_FA_BOOK " Menu", ImVec2(230 - 15, 41)))
-      settings::Tab = 4;
+      settings::Tab = 3;
 
-    ImGui::PopStyleColor(4);
+    ImGui::PopStyleColor(3);
 
     ImGui::SetCursorPosY(ImGui::GetWindowHeight() - 30);
     imguipp::center_text_ex("(c) SmartHouse", 230, 1, false);
   }
 
   ImGui::NextColumn();
-
   // Right side
   {
     // Dumper Tab
-    if (settings::Tab == 3) {
-
+    if (settings::Tab == 2) {
       if (ImGui::Button("Get logs")) {
         SetLogs();
       }

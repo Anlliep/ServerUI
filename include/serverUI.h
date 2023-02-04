@@ -12,6 +12,7 @@
 #include "imgui.h"
 #include "imguipp.h"
 #include "serverRequests.h"
+
 #define GL_SILENCE_DEPRECATION
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
@@ -69,7 +70,7 @@ class UI {
 #endif
 
     // Create window with graphics context
-    window = glfwCreateWindow(1000, 720, "SERVER", NULL, NULL);
+    window = glfwCreateWindow(1000, 720, "UI", NULL, NULL);
     if (window == NULL) std::exit(1);
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);  // Enable vsync

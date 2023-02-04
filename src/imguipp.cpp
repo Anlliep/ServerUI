@@ -1,6 +1,6 @@
+#pragma once
 #include "imguipp.h"
 namespace imguipp {
-
 float getx() { return ImGui::GetContentRegionAvail().x; }
 
 float gety() { return ImGui::GetContentRegionAvail().y; }
