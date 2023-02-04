@@ -67,13 +67,13 @@ void myUI::RenderMenu() {
 
     ImGui::Spacing();
     ImGui::PushStyleColor(ImGuiCol_Button,
-                          settings::Tab == 3 ? active : inactive);
+                          settings::Tab == 2 ? active : inactive);
     if (ImGui::Button(ICON_FA_CODE " Logs", ImVec2(230 - 15, 41)))
       settings::Tab = 2;
 
     ImGui::Spacing();
     ImGui::PushStyleColor(ImGuiCol_Button,
-                          settings::Tab == 4 ? active : inactive);
+                          settings::Tab == 3 ? active : inactive);
     if (ImGui::Button(ICON_FA_BOOK " Menu", ImVec2(230 - 15, 41)))
       settings::Tab = 3;
 
@@ -96,7 +96,7 @@ void myUI::RenderMenu() {
         ClearLogs();
       }
 
-      imguipp::center_text_ex(ICON_FA_INFO_CIRCLE "  Logs Information:", 230, 1,
+      imguipp::center_text_ex(ICON_FA_INFO_CIRCLE " Logs Information:", 170, 1,
                               false);
 
       ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
@@ -107,6 +107,19 @@ void myUI::RenderMenu() {
         }
         ImGui::ListBoxFooter();
       }
+      ImGui::PopStyleColor();
+    }
+
+    if (settings::Tab == 3) {
+      if (ImGui::Button("Close windows")) {
+        connection::UpdateWindowsStatus("closed");
+      }
+      ImGui::SameLine();
+      if (ImGui::Button("Open windows")) {
+        connection::UpdateWindowsStatus("opened");
+      }
+
+      ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
       ImGui::PopStyleColor();
     }
   }
