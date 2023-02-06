@@ -35,7 +35,7 @@ static void glfw_error_callback(int error, const char* description) {
 }
 
 namespace settings {
-static int Tab = 0;
+static int Tab = 1;
 }  // namespace settings
 
 template <typename Derived>
@@ -82,7 +82,7 @@ class UI {
     (void)io;
 
     // your fonts here
-    io.Fonts->AddFontDefault();
+    io.Fonts->AddFontFromFileTTF("../fonts/Insight Sans SSi.ttf", 18.0f);
     // fonts end
 
     // your icons here
@@ -203,7 +203,10 @@ class myUI : public UI<myUI> {
   void RenderMenu();
   void SetLogs() { logs = connection::GetLogs(); }
   void ClearLogs() { logs.clear(); }
+  void PushServ() { connection::StartServer(); }
+  void PopServ() { connection::StopServer(); }
 
  private:
   std::vector<std::string> logs;
+  bool isActive = true;
 };

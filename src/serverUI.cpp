@@ -3,7 +3,7 @@
 
 void myUI::Update() {
   SetMenuTheme();
-  ImGui::Begin("Smart house", 0,
+  ImGui::Begin("ServerUI", 0,
                ImGuiWindowFlags_NoScrollbar |
                    ImGuiWindowFlags_NoScrollWithMouse |
                    ImGuiWindowFlags_NoResize);
@@ -67,13 +67,13 @@ void myUI::RenderMenu() {
 
     ImGui::Spacing();
     ImGui::PushStyleColor(ImGuiCol_Button,
-                          settings::Tab == 3 ? active : inactive);
+                          settings::Tab == 2 ? active : inactive);
     if (ImGui::Button(ICON_FA_CODE " Logs", ImVec2(230 - 15, 41)))
       settings::Tab = 2;
 
     ImGui::Spacing();
     ImGui::PushStyleColor(ImGuiCol_Button,
-                          settings::Tab == 4 ? active : inactive);
+                          settings::Tab == 3 ? active : inactive);
     if (ImGui::Button(ICON_FA_BOOK " Menu", ImVec2(230 - 15, 41)))
       settings::Tab = 3;
 
@@ -86,13 +86,38 @@ void myUI::RenderMenu() {
   ImGui::NextColumn();
   // Right side
   {
+    if (settings::Tab == 1) {
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                            ImVec4(ImColor(0, 250, 154)));
+      if (ImGui::Button(ICON_FA_PLAY " Start Server")) {
+        PushServ();
+        isActive = true;
+      }
+      ImGui::PopStyleColor();
+      ImGui::SameLine();
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                            ImVec4(ImColor(250, 128, 114)));
+      if (ImGui::Button(ICON_FA_STOP " Stop Server")) {
+        PopServ();
+        isActive = false;
+      }
+      ImGui::PopStyleColor();
+      ImGui::NewLine();
+      if (isActive)
+        imguipp::center_text_ex(ICON_FA_INFO_CIRCLE "  Server is running!",
+                                230, 1, true);
+      else
+        imguipp::center_text_ex(ICON_FA_INFO_CIRCLE "  Server isn't active!",
+                                230, 1, true);
+    }
+
     // Dumper Tab
     if (settings::Tab == 2) {
-      if (ImGui::Button("Get logs")) {
+      if (ImGui::Button(ICON_FA_ARROW_CIRCLE_UP " Update logs")) {
         SetLogs();
       }
       ImGui::SameLine();
-      if (ImGui::Button("Clear logs")) {
+      if (ImGui::Button(ICON_FA_TRASH " Clear logs")) {
         ClearLogs();
       }
 

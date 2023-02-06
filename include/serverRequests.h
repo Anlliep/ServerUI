@@ -14,4 +14,7 @@ using namespace Poco::Net;
 
 namespace connection {
 std::vector<std::string> GetLogs();
+
+void StartServer();
+void StopServer();
 }  // namespace connection
