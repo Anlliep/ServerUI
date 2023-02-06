@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "serverRequests.h"
 
-std::vector<std::string> connection::GetLogs() {
+std::vector<std::string> connection::UpdateLogs() {
   URI uri("http://15.188.57.7:8080");
   HTTPClientSession session(uri.getHost(), uri.getPort());
 
@@ -30,14 +30,12 @@ std::vector<std::string> connection::GetLogs() {
   return logs;
 }
 
-void connection::UpdateWindowsStatus(const std::string& state) {
-   URI uri("http://15.188.57.7:8080");
+void connection::UpdateStatus(const std::string& id, const std::string& state) {
+  URI uri("http://15.188.57.7:8080");
   HTTPClientSession session(uri.getHost(), uri.getPort());
 
-  std::string path = "/device?id=2";
-
   session.setKeepAliveTimeout(true);
-  HTTPRequest request(HTTPRequest::HTTP_PUT, path, HTTPMessage::HTTP_1_1);
+  HTTPRequest request(HTTPRequest::HTTP_PUT, id, HTTPMessage::HTTP_1_1);
 
   std::string status = "{\"status\" : \"" + state + "\"}";
 
@@ -49,4 +47,26 @@ void connection::UpdateWindowsStatus(const std::string& state) {
   if (response.getStatus() != 200) {
     throw std::exception("bad response");
   }
+}
+
+void connection::StartServer() {
+  URI uri("http://15.188.57.7:8008");
+  HTTPClientSession session(uri.getHost(), uri.getPort());
+
+  std::string path = "/start";
+
+  session.setKeepAliveTimeout(true);
+  HTTPRequest request(HTTPRequest::HTTP_GET, path, HTTPMessage::HTTP_1_1);
+  session.sendRequest(request);
+}
+
+void connection::StopServer() {
+  URI uri("http://15.188.57.7:8008");
+  HTTPClientSession session(uri.getHost(), uri.getPort());
+
+  std::string path = "/stop";
+
+  session.setKeepAliveTimeout(true);
+  HTTPRequest request(HTTPRequest::HTTP_GET, path, HTTPMessage::HTTP_1_1);
+  session.sendRequest(request);
 }

@@ -13,7 +13,9 @@ using namespace Poco;
 using namespace Poco::Net;
 
 namespace connection {
-std::vector<std::string> GetLogs();
-void UpdateWindowsStatus(const std::string& state);
+std::vector<std::string> UpdateLogs();
+void UpdateStatus(const std::string&, const std::string&);
+void StartServer();
+void StopServer();
 }  // namespace connection
 

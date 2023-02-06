@@ -9,8 +9,10 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
-build/*
-bin/*
+Server/build/*
+Server/bin/*
+Server/logs/*
+Server/db/*
 
 # Prerequisites
 *.d
@@ -61,4 +63,6 @@ bin/*
 
 RunRebuild.sh
 
-bindings/
+# UI
+UI/build/*
+UI/bindings/*

@@ -3,6 +3,7 @@
 
 int main() {
   myUI ui;
+  ui.SetLogs();
   ui.Run();
   return 0;
 }

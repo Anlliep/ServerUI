@@ -82,7 +82,7 @@ class UI {
     (void)io;
 
     // your fonts here
-    io.Fonts->AddFontDefault();
+    io.Fonts->AddFontFromFileTTF("../fonts/InsightSansSSi.ttf", 18.0f);
     // fonts end
 
     // your icons here
@@ -201,9 +201,12 @@ class myUI : public UI<myUI> {
 
   void SetMenuTheme();
   void RenderMenu();
-  void SetLogs() { logs = connection::GetLogs(); }
+  void SetLogs() { logs = connection::UpdateLogs(); }
   void ClearLogs() { logs.clear(); }
+  void PushServ() { connection::StartServer(); }
+  void PopServ() { connection::StopServer(); }
 
  private:
   std::vector<std::string> logs;
+  bool isActive = true;
 };

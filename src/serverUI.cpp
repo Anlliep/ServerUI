@@ -86,17 +86,42 @@ void myUI::RenderMenu() {
   ImGui::NextColumn();
   // Right side
   {
+    if (settings::Tab == 1) {
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                            ImVec4(ImColor(0, 250, 154)));
+      if (ImGui::Button(ICON_FA_PLAY " Start Server")) {
+        PushServ();
+        isActive = true;
+      }
+      ImGui::PopStyleColor();
+      ImGui::SameLine();
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                            ImVec4(ImColor(250, 128, 114)));
+      if (ImGui::Button(ICON_FA_STOP " Stop Server")) {
+        PopServ();
+        isActive = false;
+      }
+      ImGui::PopStyleColor();
+      ImGui::NewLine();
+      if (isActive)
+        imguipp::center_text_ex(ICON_FA_INFO_CIRCLE "  Server is running!", 230,
+                                1, true);
+      else
+        imguipp::center_text_ex(ICON_FA_INFO_CIRCLE "  Server isn't active!",
+                                230, 1, true);
+    }
+
     // Dumper Tab
     if (settings::Tab == 2) {
-      if (ImGui::Button("Get logs")) {
+      if (ImGui::Button(ICON_FA_ARROW_CIRCLE_UP  " Update logs")) {
         SetLogs();
       }
       ImGui::SameLine();
-      if (ImGui::Button("Clear logs")) {
+      if (ImGui::Button(ICON_FA_TRASH  " Clear logs")) {
         ClearLogs();
       }
 
-      imguipp::center_text_ex(ICON_FA_INFO_CIRCLE " Logs Information:", 170, 1,
+      imguipp::center_text_ex(ICON_FA_INFO_CIRCLE "  Logs Information:", 230, 1,
                               false);
 
       ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
@@ -112,11 +137,20 @@ void myUI::RenderMenu() {
 
     if (settings::Tab == 3) {
       if (ImGui::Button("Close windows")) {
-        connection::UpdateWindowsStatus("closed");
+        connection::UpdateStatus("/device?id=2", "closed");
       }
       ImGui::SameLine();
+
       if (ImGui::Button("Open windows")) {
-        connection::UpdateWindowsStatus("opened");
+        connection::UpdateStatus("/device?id=2", "opened");
+      }
+
+      if (ImGui::Button("Runnig the smoke scenario")) {
+        connection::UpdateStatus("/device?id=0", "SmokeDetected");
+      }
+
+      if (ImGui::Button("Runnig the water scenario")) {
+        connection::UpdateStatus("/device?id=1", "WaterDetected");
       }
 
       ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
