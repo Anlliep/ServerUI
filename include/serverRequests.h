@@ -14,8 +14,8 @@ using namespace Poco::Net;
 
 namespace connection {
 std::vector<std::string> UpdateLogs();
+bool IsServerActive();
 void UpdateStatus(const std::string&, const std::string&);
 void StartServer();
 void StopServer();
 }  // namespace connection
-

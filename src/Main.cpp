@@ -1,9 +1,10 @@
 ﻿#include <iostream>
+
 #include "serverUI.h"
 
 int main() {
   myUI ui;
-  ui.SetLogs();
+  ui.SetIsServerActive();
   ui.Run();
   return 0;
 }

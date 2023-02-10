@@ -3,11 +3,9 @@
 
 void myUI::Update() {
   SetMenuTheme();
-  ImGui::Begin("Smart house", 0,
-               ImGuiWindowFlags_NoScrollbar |
-                   ImGuiWindowFlags_NoScrollWithMouse |
-                   ImGuiWindowFlags_NoResize);
-
+  ImGui::Begin(
+      "ServerUI", 0,
+      ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
   RenderMenu();
 
   ImGui::End();
@@ -91,7 +89,7 @@ void myUI::RenderMenu() {
                             ImVec4(ImColor(0, 250, 154)));
       if (ImGui::Button(ICON_FA_PLAY " Start Server")) {
         PushServ();
-        isActive = true;
+        isServerActive = true;
       }
       ImGui::PopStyleColor();
       ImGui::SameLine();
@@ -99,11 +97,11 @@ void myUI::RenderMenu() {
                             ImVec4(ImColor(250, 128, 114)));
       if (ImGui::Button(ICON_FA_STOP " Stop Server")) {
         PopServ();
-        isActive = false;
+        isServerActive = false;
       }
       ImGui::PopStyleColor();
       ImGui::NewLine();
-      if (isActive)
+      if (isServerActive)
         imguipp::center_text_ex(ICON_FA_INFO_CIRCLE "  Server is running!", 230,
                                 1, true);
       else
@@ -111,13 +109,12 @@ void myUI::RenderMenu() {
                                 230, 1, true);
     }
 
-    // Dumper Tab
-    if (settings::Tab == 2) {
-      if (ImGui::Button(ICON_FA_ARROW_CIRCLE_UP  " Update logs")) {
+    if (settings::Tab == 2 && isServerActive) {
+      if (ImGui::Button(ICON_FA_ARROW_CIRCLE_UP " Update logs")) {
         SetLogs();
       }
       ImGui::SameLine();
-      if (ImGui::Button(ICON_FA_TRASH  " Clear logs")) {
+      if (ImGui::Button(ICON_FA_TRASH " Clear logs")) {
         ClearLogs();
       }
 
@@ -135,26 +132,79 @@ void myUI::RenderMenu() {
       ImGui::PopStyleColor();
     }
 
-    if (settings::Tab == 3) {
-      if (ImGui::Button("Close windows")) {
-        connection::UpdateStatus("/device?id=2", "closed");
+    if (settings::Tab == 3 && isServerActive) {
+      ImGui::Text(ICON_FA_INFO_CIRCLE " Light: ");
+
+      if (ImGui::Button("On##1", ImVec2(70, 0))) {
+        connection::UpdateStatus("/device?id=3", "on");
       }
       ImGui::SameLine();
 
-      if (ImGui::Button("Open windows")) {
+      if (ImGui::Button("Off##1", ImVec2(70, 0))) {
+        connection::UpdateStatus("/device?id=3", "off");
+      }
+      ImGui::NewLine();
+
+      ImGui::Text(ICON_FA_INFO_CIRCLE " Device: ");
+
+      if (ImGui::Button("On##2", ImVec2(70, 0))) {
+        connection::UpdateStatus("/device?id=4", "on");
+      }
+      ImGui::SameLine();
+
+      if (ImGui::Button("Off##2", ImVec2(70, 0))) {
+        connection::UpdateStatus("/device?id=4", "off");
+      }
+      ImGui::NewLine();
+
+      ImGui::Text(ICON_FA_INFO_CIRCLE " Oven: ");
+
+      if (ImGui::Button("On##3", ImVec2(70, 0))) {
+        connection::UpdateStatus("/device?id=5", "on");
+      }
+      ImGui::SameLine();
+
+      if (ImGui::Button("Off##3", ImVec2(70, 0))) {
+        connection::UpdateStatus("/device?id=5", "off");
+      }
+      ImGui::NewLine();
+
+      ImGui::Text(ICON_FA_INFO_CIRCLE " Windows: ");
+
+      if (ImGui::Button("Open##1", ImVec2(70, 0))) {
         connection::UpdateStatus("/device?id=2", "opened");
       }
+      ImGui::SameLine();
 
-      if (ImGui::Button("Runnig the smoke scenario")) {
-        connection::UpdateStatus("/device?id=0", "SmokeDetected");
+      if (ImGui::Button("Close##1", ImVec2(70, 0))) {
+        connection::UpdateStatus("/device?id=2", "closed");
       }
+      ImGui::NewLine();
 
-      if (ImGui::Button("Runnig the water scenario")) {
-        connection::UpdateStatus("/device?id=1", "WaterDetected");
+      ImGui::Text(ICON_FA_INFO_CIRCLE " Tap: ");
+
+      if (ImGui::Button("Open##2", ImVec2(70, 0))) {
+        connection::UpdateStatus("/device?id=6", "opened");
       }
+      ImGui::SameLine();
 
-      ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
-      ImGui::PopStyleColor();
+      if (ImGui::Button("Close##2", ImVec2(70, 0))) {
+        connection::UpdateStatus("/device?id=6", "closed");
+      }
+      ImGui::NewLine();
+
+      ImGui::Text(ICON_FA_INFO_CIRCLE " Garage door: ");
+
+      if (ImGui::Button("Open##3", ImVec2(70, 0))) {
+        connection::UpdateStatus("/device?id=7", "opened");
+      }
+      ImGui::SameLine();
+
+      if (ImGui::Button("Close##3", ImVec2(70, 0))) {
+        connection::UpdateStatus("/device?id=7", "closed");
+      }
     }
   }
+  ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
+  ImGui::PopStyleColor();
 }

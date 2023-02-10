@@ -70,7 +70,7 @@ class UI {
 #endif
 
     // Create window with graphics context
-    window = glfwCreateWindow(1000, 720, "UI", NULL, NULL);
+    window = glfwCreateWindow(1200, 600, "UI", NULL, NULL);
     if (window == NULL) std::exit(1);
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);  // Enable vsync
@@ -82,7 +82,7 @@ class UI {
     (void)io;
 
     // your fonts here
-    io.Fonts->AddFontFromFileTTF("../fonts/InsightSansSSi.ttf", 18.0f);
+    io.Fonts->AddFontFromFileTTF("../fonts/InsightSansSSi.ttf", 14.0f);
     // fonts end
 
     // your icons here
@@ -198,15 +198,16 @@ class myUI : public UI<myUI> {
   void StartUp() {}
 
   void Update();
-
   void SetMenuTheme();
   void RenderMenu();
+
   void SetLogs() { logs = connection::UpdateLogs(); }
   void ClearLogs() { logs.clear(); }
+  void SetIsServerActive() { isServerActive = connection::IsServerActive(); }
   void PushServ() { connection::StartServer(); }
   void PopServ() { connection::StopServer(); }
 
  private:
-  std::vector<std::string> logs;
-  bool isActive = true;
+  std::vector<std::string> logs{};
+  bool isServerActive{};
 };
