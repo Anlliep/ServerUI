@@ -35,7 +35,7 @@ static void glfw_error_callback(int error, const char* description) {
 }
 
 namespace settings {
-static int Tab = 0;
+static int Tab = 1;
 }  // namespace settings
 
 template <typename Derived>
@@ -82,7 +82,7 @@ class UI {
     (void)io;
 
     // your fonts here
-    io.Fonts->AddFontFromFileTTF("../fonts/InsightSansSSi.ttf", 14.0f);
+    io.Fonts->AddFontFromFileTTF("../fonts/InsightSansSSi.ttf", 18.0f);
     // fonts end
 
     // your icons here
@@ -91,7 +91,7 @@ class UI {
     config.GlyphMinAdvanceX =
         13.0f;  // Use if you want to make the icon monospaced
     static const ImWchar icon_ranges[] = {ICON_MIN_FA, ICON_MAX_FA, 0};
-    io.Fonts->AddFontFromFileTTF("../fonts/fontawesome-webfont.ttf", 13.0f,
+    io.Fonts->AddFontFromFileTTF("../fonts/fontawesome-webfont.ttf", 15.0f,
                                  &config, icon_ranges);
     // icons end
 
@@ -201,13 +201,12 @@ class myUI : public UI<myUI> {
   void SetMenuTheme();
   void RenderMenu();
 
-  void SetLogs() { logs = connection::UpdateLogs(); }
   void ClearLogs() { logs.clear(); }
   void SetIsServerActive() { isServerActive = connection::IsServerActive(); }
-  void PushServ() { connection::StartServer(); }
-  void PopServ() { connection::StopServer(); }
 
  private:
   std::vector<std::string> logs{};
   bool isServerActive{};
+  char* buf;
+  size_t size = 30;
 };

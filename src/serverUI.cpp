@@ -57,12 +57,6 @@ void myUI::RenderMenu() {
                       ImVec2(230 - 15, 41)))
       settings::Tab = 1;
 
-    /*ImGui::Spacing();
-    ImGui::PushStyleColor(ImGuiCol_Button,
-                          settings::Tab == 2 ? active : inactive);
-    if (ImGui::Button(ICON_FA_USERS " Users", ImVec2(230 - 15, 41)))
-      settings::Tab = 2;*/
-
     ImGui::Spacing();
     ImGui::PushStyleColor(ImGuiCol_Button,
                           settings::Tab == 2 ? active : inactive);
@@ -88,7 +82,11 @@ void myUI::RenderMenu() {
       ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
                             ImVec4(ImColor(0, 250, 154)));
       if (ImGui::Button(ICON_FA_PLAY " Start Server")) {
-        PushServ();
+        if (strlen(buf) == 0) {
+          connection::StartStopServer("http://15.188.57.7:8008", "/start");
+        } else {
+          connection::StartStopServer(buf, "/start");
+        }
         isServerActive = true;
       }
       ImGui::PopStyleColor();
@@ -96,7 +94,7 @@ void myUI::RenderMenu() {
       ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
                             ImVec4(ImColor(250, 128, 114)));
       if (ImGui::Button(ICON_FA_STOP " Stop Server")) {
-        PopServ();
+        connection::StartStopServer("http://15.188.57.7:8008", "/stop");
         isServerActive = false;
       }
       ImGui::PopStyleColor();
@@ -107,25 +105,53 @@ void myUI::RenderMenu() {
       else
         imguipp::center_text_ex(ICON_FA_INFO_CIRCLE "  Server isn't active!",
                                 230, 1, true);
+      ImGui::NewLine();
+      imguipp::center_text_ex(
+          ICON_FA_INFO_CIRCLE " Determine your server address:", 245, 1, true);
+      ImGui::PushItemWidth(240.0f);
+      /*ImGui::PushStyleColor(ImGuiCol_FrameBg,
+        ImVec4(ImColor(0, 250, 154)));*/
+      ImGui::InputTextWithHint("##input", "http://ip:port", buf, size,
+                               ImGuiInputTextFlags_CharsNoBlank);
+      /*ImGui::PopStyleColor();*/
+      ImGui::PopItemWidth();
     }
 
     if (settings::Tab == 2 && isServerActive) {
-      if (ImGui::Button(ICON_FA_ARROW_CIRCLE_UP " Update logs")) {
-        SetLogs();
+      if (ImGui::Button(ICON_FA_FILE_CODE " All logs")) {
+        ClearLogs();
+        logs = connection::UpdateLogs("");
       }
       ImGui::SameLine();
-      if (ImGui::Button(ICON_FA_TRASH " Clear logs")) {
+      if (ImGui::Button(ICON_FA_INFO " Information")) {
+        ClearLogs();
+        logs = connection::UpdateLogs("information");
+      }
+      ImGui::SameLine();
+      if (ImGui::Button(ICON_FA_MAP_SIGNS " Error")) {
+        ClearLogs();
+        logs = connection::UpdateLogs("error");
+      }
+      ImGui::SameLine();
+      if (ImGui::Button(ICON_FA_MAP_PIN " Warning")) {
+        ClearLogs();
+        logs = connection::UpdateLogs("warning");
+      }
+      ImGui::SameLine();
+      if (ImGui::Button(ICON_FA_TRASH " Clear")) {
         ClearLogs();
       }
 
+      ImGui::NewLine();
       imguipp::center_text_ex(ICON_FA_INFO_CIRCLE "  Logs Information:", 230, 1,
                               false);
 
       ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
       if (ImGui::ListBoxHeader("##ResourcesList",
                                ImVec2(imguipp::getx(), imguipp::gety() - 35))) {
-        for (const auto& resource : logs) {
-          if (ImGui::TreeNode(resource.c_str())) ImGui::TreePop();
+        for (auto it = logs.crbegin(); it != logs.crend(); ++it) {
+          std::string logsStr{*it};
+          if (ImGui::TreeNode(logsStr.c_str())) ImGui::TreePop();
         }
         ImGui::ListBoxFooter();
       }
