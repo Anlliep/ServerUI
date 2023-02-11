@@ -124,8 +124,9 @@ void myUI::RenderMenu() {
       ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
       if (ImGui::ListBoxHeader("##ResourcesList",
                                ImVec2(imguipp::getx(), imguipp::gety() - 35))) {
-        for (const auto& resource : logs) {
-          if (ImGui::TreeNode(resource.c_str())) ImGui::TreePop();
+        for (auto it = logs.crbegin(); it != logs.crend(); ++it) {
+          std::string logsStr{*it};
+          if (ImGui::TreeNode(logsStr.c_str())) ImGui::TreePop();
         }
         ImGui::ListBoxFooter();
       }

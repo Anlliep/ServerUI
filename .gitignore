@@ -64,5 +64,5 @@ Server/db/*
 RunRebuild.sh
 
 # UI
-UI/build/*
-UI/bindings/*
+build/*
+bindings/*
