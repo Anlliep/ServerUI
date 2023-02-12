@@ -3,9 +3,10 @@
 
 void myUI::Update() {
   SetMenuTheme();
-  ImGui::Begin(
-      "ServerUI", 0,
-      ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+  ImGui::Begin("ServerUI", 0,
+               ImGuiWindowFlags_NoScrollbar |
+                   ImGuiWindowFlags_NoScrollWithMouse |
+                   ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
   RenderMenu();
 
   ImGui::End();
@@ -19,7 +20,7 @@ void myUI::SetMenuTheme() {
   style->WindowTitleAlign = ImVec2(0.5, 0.5);
   style->WindowMinSize = ImVec2(900, 430);
 
-  style->FramePadding = ImVec2(8, 6);
+  //style->FramePadding = ImVec2(8, 6);
 
   style->Colors[ImGuiCol_TitleBg] = ImColor(255, 101, 53, 255);
   style->Colors[ImGuiCol_TitleBgActive] = ImColor(255, 101, 53, 255);
@@ -107,7 +108,7 @@ void myUI::RenderMenu() {
                                 230, 1, true);
       ImGui::NewLine();
       imguipp::center_text_ex(
-          ICON_FA_INFO_CIRCLE " Determine your server address:", 245, 1, true);
+          ICON_FA_INFO_CIRCLE " Determine your server address:", 285, 1, true);
       ImGui::PushItemWidth(240.0f);
       /*ImGui::PushStyleColor(ImGuiCol_FrameBg,
         ImVec4(ImColor(0, 250, 154)));*/

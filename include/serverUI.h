@@ -73,7 +73,8 @@ class UI {
     window = glfwCreateWindow(1200, 600, "UI", NULL, NULL);
     if (window == NULL) std::exit(1);
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);  // Enable vsync
+    glfwSwapInterval(1);  
+    // Enable vsync
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
