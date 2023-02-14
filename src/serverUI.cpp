@@ -20,7 +20,7 @@ void myUI::SetMenuTheme() {
   style->WindowTitleAlign = ImVec2(0.5, 0.5);
   style->WindowMinSize = ImVec2(1070, 470);
 
-  // style->FramePadding = ImVec2(8, 6);
+  style->FramePadding = ImVec2(8, 6);
 
   style->Colors[ImGuiCol_TitleBg] = ImColor(255, 101, 53, 255);
   style->Colors[ImGuiCol_TitleBgActive] = ImColor(255, 101, 53, 255);
@@ -104,11 +104,10 @@ void myUI::RenderMenu() {
         else
           imguipp::center_text_ex(ICON_FA_INFO_CIRCLE "  Server isn't active!",
                                   230, 1, true);
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
-                              ImVec4(ImColor(0, 250, 154)));
         ImGui::NewLine();
-
-        if (ImGui::Button("Local Host")) {
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                              ImVec4(ImColor(78, 189, 221)));
+        if (ImGui::Button(ICON_FA_REDO " Local Host")) {
           url = "http://localhost:8080";
           SetIsServerActive();
 
@@ -182,18 +181,22 @@ void myUI::RenderMenu() {
     }
 
     if (settings::Tab == 3 && isServerActive) {
-      ImGui::Text(ICON_FA_INFO_CIRCLE " Light: ");
-
+      ImGui::Text(ICON_FA_LIGHTBULB " Light: ");
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                            ImVec4(ImColor(0, 250, 154)));
       if (ImGui::Button("On##1", ImVec2(70, 0))) {
         connection::UpdateStatus("/device?id=3", "on", url);
         menuStatuses.isLight = true;
       }
+      ImGui::PopStyleColor();
       ImGui::SameLine();
-
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                            ImVec4(ImColor(250, 128, 114)));
       if (ImGui::Button("Off##1", ImVec2(70, 0))) {
         connection::UpdateStatus("/device?id=3", "off", url);
         menuStatuses.isLight = false;
       }
+      ImGui::PopStyleColor();
       ImGui::SameLine();
 
       if (menuStatuses.isLight)
@@ -202,18 +205,22 @@ void myUI::RenderMenu() {
         ImGui::Text(ICON_FA_INFO_CIRCLE "  Light is off");
 
       ImGui::NewLine();
-      ImGui::Text(ICON_FA_INFO_CIRCLE " Device: ");
-
+      ImGui::Text(ICON_FA_LAPTOP " Device: ");
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                            ImVec4(ImColor(0, 250, 154)));
       if (ImGui::Button("On##2", ImVec2(70, 0))) {
         connection::UpdateStatus("/device?id=4", "on", url);
         menuStatuses.isDevice = true;
       }
+      ImGui::PopStyleColor();
       ImGui::SameLine();
-
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                            ImVec4(ImColor(250, 128, 114)));
       if (ImGui::Button("Off##2", ImVec2(70, 0))) {
         connection::UpdateStatus("/device?id=4", "off", url);
         menuStatuses.isDevice = false;
       }
+      ImGui::PopStyleColor();
       ImGui::SameLine();
 
       if (menuStatuses.isDevice)
@@ -222,18 +229,22 @@ void myUI::RenderMenu() {
         ImGui::Text(ICON_FA_INFO_CIRCLE "  Device is off");
 
       ImGui::NewLine();
-      ImGui::Text(ICON_FA_INFO_CIRCLE " Oven: ");
-
+      ImGui::Text(ICON_FA_FIRE " Oven: ");
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                            ImVec4(ImColor(0, 250, 154)));
       if (ImGui::Button("On##3", ImVec2(70, 0))) {
         connection::UpdateStatus("/device?id=5", "on", url);
         menuStatuses.isOven = true;
       }
+      ImGui::PopStyleColor();
       ImGui::SameLine();
-
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                            ImVec4(ImColor(250, 128, 114)));
       if (ImGui::Button("Off##3", ImVec2(70, 0))) {
         connection::UpdateStatus("/device?id=5", "off", url);
         menuStatuses.isOven = false;
       }
+      ImGui::PopStyleColor();
       ImGui::SameLine();
 
       if (menuStatuses.isOven)
@@ -242,18 +253,22 @@ void myUI::RenderMenu() {
         ImGui::Text(ICON_FA_INFO_CIRCLE "  Oven is off");
 
       ImGui::NewLine();
-      ImGui::Text(ICON_FA_INFO_CIRCLE " Windows: ");
-
+      ImGui::Text(ICON_FA_WINDOW_MAXIMIZE " Windows: ");
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                            ImVec4(ImColor(0, 250, 154)));
       if (ImGui::Button("Open##1", ImVec2(70, 0))) {
         connection::UpdateStatus("/device?id=2", "opened", url);
         menuStatuses.isWindows = true;
       }
+      ImGui::PopStyleColor();
       ImGui::SameLine();
-
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                            ImVec4(ImColor(250, 128, 114)));
       if (ImGui::Button("Close##1", ImVec2(70, 0))) {
         connection::UpdateStatus("/device?id=2", "closed", url);
         menuStatuses.isWindows = false;
       }
+      ImGui::PopStyleColor();
       ImGui::SameLine();
       if (menuStatuses.isWindows)
         ImGui::Text(ICON_FA_INFO_CIRCLE "  Windows are opened");
@@ -261,18 +276,23 @@ void myUI::RenderMenu() {
         ImGui::Text(ICON_FA_INFO_CIRCLE "  Windows are closed");
       ImGui::NewLine();
 
-      ImGui::Text(ICON_FA_INFO_CIRCLE " Tap: ");
-
+      ImGui::Text(ICON_FA_WATER ICON_FA_WATER_LOWER ICON_FA_WATER_RISE
+                  " Tap: ");
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                            ImVec4(ImColor(0, 250, 154)));
       if (ImGui::Button("Open##2", ImVec2(70, 0))) {
         connection::UpdateStatus("/device?id=6", "opened", url);
         menuStatuses.isTap = true;
       }
+      ImGui::PopStyleColor();
       ImGui::SameLine();
-
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                            ImVec4(ImColor(250, 128, 114)));
       if (ImGui::Button("Close##2", ImVec2(70, 0))) {
         connection::UpdateStatus("/device?id=6", "closed", url);
         menuStatuses.isTap = false;
       }
+      ImGui::PopStyleColor();
       ImGui::SameLine();
 
       if (menuStatuses.isTap)
@@ -281,18 +301,22 @@ void myUI::RenderMenu() {
         ImGui::Text(ICON_FA_INFO_CIRCLE "  Tap is closed");
       ImGui::NewLine();
 
-      ImGui::Text(ICON_FA_INFO_CIRCLE " Garage door: ");
-
+      ImGui::Text(ICON_FA_CAR " Garage door: ");
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                            ImVec4(ImColor(0, 250, 154)));
       if (ImGui::Button("Open##3", ImVec2(70, 0))) {
         connection::UpdateStatus("/device?id=7", "opened", url);
         menuStatuses.isGarage = true;
       }
+      ImGui::PopStyleColor();
       ImGui::SameLine();
-
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                            ImVec4(ImColor(250, 128, 114)));
       if (ImGui::Button("Close##3", ImVec2(70, 0))) {
         connection::UpdateStatus("/device?id=7", "closed", url);
         menuStatuses.isGarage = false;
       }
+      ImGui::PopStyleColor();
       ImGui::SameLine();
 
       if (menuStatuses.isGarage)

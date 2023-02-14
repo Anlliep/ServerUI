@@ -76,7 +76,7 @@ class UI {
     (void)io;
 
     // your fonts here
-    io.Fonts->AddFontFromFileTTF("../fonts/InsightSansSSi.ttf", 14.0f);
+    io.Fonts->AddFontFromFileTTF("../fonts/InsightSansSSi.ttf", 16.0f);
     // fonts end
 
     // your icons here
@@ -160,7 +160,6 @@ class myUI : public UI<myUI> {
   void ClearLogs() { logs.clear(); }
   void SetIsServerActive();
   void SetStatuses();
-  std::string GetUrl() const { return url; }
 
  private:
   std::vector<std::string> logs{};
