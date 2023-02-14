@@ -1,8 +1,9 @@
 ﻿#pragma once
 #include "serverRequests.h"
 
-std::vector<std::string> connection::UpdateLogs(const std::string& type) {
-  URI uri("http://15.188.57.7:8080");
+std::vector<std::string> connection::UpdateLogs(const std::string& type,
+                                                const std::string& url) {
+  URI uri(url);
   HTTPClientSession session(uri.getHost(), uri.getPort());
 
   std::string path;
@@ -21,7 +22,8 @@ std::vector<std::string> connection::UpdateLogs(const std::string& type) {
     try {
       session.sendRequest(request);
       break;
-    } catch (...) {
+    } catch (const std::exception& ex) {
+      std::cout << ex.what() << std::endl;
       ++attempts;
     }
   }
@@ -42,8 +44,8 @@ std::vector<std::string> connection::UpdateLogs(const std::string& type) {
   return logs;
 }
 
-bool connection::IsServerActive() {
-  URI uri("http://15.188.57.7:8080");
+bool connection::IsServerActive(const std::string& url) {
+  URI uri(url);
   HTTPClientSession session(uri.getHost(), uri.getPort());
 
   session.setKeepAliveTimeout(true);
@@ -57,8 +59,9 @@ bool connection::IsServerActive() {
   }
 }
 
-void connection::UpdateStatus(const std::string& id, const std::string& state) {
-  URI uri("http://15.188.57.7:8080");
+void connection::UpdateStatus(const std::string& id, const std::string& state,
+                              const std::string& url) {
+  URI uri(url);
   HTTPClientSession session(uri.getHost(), uri.getPort());
 
   session.setKeepAliveTimeout(true);
@@ -74,7 +77,8 @@ void connection::UpdateStatus(const std::string& id, const std::string& state) {
       std::ostream& os = session.sendRequest(request);
       os << status;
       break;
-    } catch (...) {
+    } catch (const std::exception& ex) {
+      std::cout << ex.what() << std::endl;
       ++attempts;
     }
   }
@@ -85,15 +89,13 @@ void connection::UpdateStatus(const std::string& id, const std::string& state) {
   }
 }
 
-void connection::StartStopServer(const std::string& ip,
-                                 const std::string& action) {
-  URI uri(ip);
+void connection::StartStopServer(const std::string& action) {
+  URI uri("http://15.188.57.7:8008");
   HTTPClientSession session(uri.getHost(), uri.getPort());
 
-  std::string path = action;
-
   session.setKeepAliveTimeout(true);
-  HTTPRequest request(HTTPRequest::HTTP_GET, path, HTTPMessage::HTTP_1_1);
+  HTTPRequest request(HTTPRequest::HTTP_GET, action, HTTPMessage::HTTP_1_1);
+  session.sendRequest(request);
 
   HTTPResponse response;
   if (response.getStatus() != 200) {
@@ -101,8 +103,9 @@ void connection::StartStopServer(const std::string& ip,
   }
 }
 
-connection::MenuStatuses connection::UpdateMenuStatuses() {
-  URI uri("http://15.188.57.7:8080");
+connection::MenuStatuses connection::UpdateMenuStatuses(
+    const std::string& url) {
+  URI uri(url);
   HTTPClientSession session(uri.getHost(), uri.getPort());
 
   std::string path = "/device";
@@ -115,43 +118,48 @@ connection::MenuStatuses connection::UpdateMenuStatuses() {
     try {
       session.sendRequest(request);
       break;
-    } catch (...) {
+    } catch (const std::exception& ex) {
+      std::cout << ex.what() << std::endl;
       ++attempts;
     }
   }
 
   HTTPResponse response;
-  std::istream& page = session.receiveResponse(response);
 
-  Parser parser;
-  Var status = parser.parse(page);
-  Poco::JSON::Array::Ptr arr = status.extract<Poco::JSON::Array::Ptr>();
+  try {
+    std::istream& page = session.receiveResponse(response);
+    Parser parser;
+    Var status = parser.parse(page);
+    Poco::JSON::Array::Ptr arr = status.extract<Poco::JSON::Array::Ptr>();
 
-  MenuStatuses menuStatuses;
+    MenuStatuses menuStatuses;
 
-  Object::Ptr object = arr->getObject(2);
-  Var windows = object->get("status");
-  if (windows.toString() == "opened") menuStatuses.isWindows = true;
+    Object::Ptr object = arr->getObject(2);
+    Var windows = object->get("status");
+    if (windows.toString() == "opened") menuStatuses.isWindows = true;
 
-  object = arr->getObject(3);
-  Var light = object->get("status");
-  if (light.toString() == "on") menuStatuses.isLight = true;
+    object = arr->getObject(3);
+    Var light = object->get("status");
+    if (light.toString() == "on") menuStatuses.isLight = true;
 
-  object = arr->getObject(4);
-  Var device = object->get("status");
-  if (device.toString() == "on") menuStatuses.isDevice = true;
+    object = arr->getObject(4);
+    Var device = object->get("status");
+    if (device.toString() == "on") menuStatuses.isDevice = true;
 
-  object = arr->getObject(5);
-  Var oven = object->get("status");
-  if (oven.toString() == "on") menuStatuses.isOven = true;
+    object = arr->getObject(5);
+    Var oven = object->get("status");
+    if (oven.toString() == "on") menuStatuses.isOven = true;
 
-  object = arr->getObject(6);
-  Var tap = object->get("status");
-  if (tap.toString() == "opened") menuStatuses.isTap = true;
+    object = arr->getObject(6);
+    Var tap = object->get("status");
+    if (tap.toString() == "opened") menuStatuses.isTap = true;
 
-  object = arr->getObject(7);
-  Var garage = object->get("status");
-  if (garage.toString() == "opened") menuStatuses.isGarage = true;
+    object = arr->getObject(7);
+    Var garage = object->get("status");
+    if (garage.toString() == "opened") menuStatuses.isGarage = true;
 
-  return menuStatuses;
+    return menuStatuses;
+  } catch (const std::exception& ex) {
+    std::cout << ex.what() << std::endl;
+  }
 }

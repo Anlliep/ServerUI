@@ -80,64 +80,85 @@ void myUI::RenderMenu() {
   // Right side
   {
     if (settings::Tab == 1) {
-      ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
-                            ImVec4(ImColor(0, 250, 154)));
-      if (ImGui::Button(ICON_FA_PLAY " Start Server")) {
-        if (strlen(buf) == 0) {
-          connection::StartStopServer("http://15.188.57.7:8008", "/start");
-        } else {
-          connection::StartStopServer(buf, "/start");
+      if (!isLocalHost) {
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                              ImVec4(ImColor(0, 250, 154)));
+        if (ImGui::Button(ICON_FA_PLAY " Start Server")) {
+          connection::StartStopServer("/start");
+          isServerActive = true;
+          SetStatuses();
         }
-        isServerActive = true;
-        SetStatuses();
+        ImGui::PopStyleColor();
+        ImGui::SameLine();
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                              ImVec4(ImColor(250, 128, 114)));
+        if (ImGui::Button(ICON_FA_STOP " Stop Server")) {
+          connection::StartStopServer("/stop");
+          isServerActive = false;
+        }
+        ImGui::PopStyleColor();
+        ImGui::NewLine();
+        if (isServerActive)
+          imguipp::center_text_ex(ICON_FA_INFO_CIRCLE "  Server is running!",
+                                  230, 1, true);
+        else
+          imguipp::center_text_ex(ICON_FA_INFO_CIRCLE "  Server isn't active!",
+                                  230, 1, true);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                              ImVec4(ImColor(0, 250, 154)));
+        ImGui::NewLine();
+
+        if (ImGui::Button("Local Host")) {
+          url = "http://localhost:8080";
+          SetIsServerActive();
+
+          if (isServerActive) {
+            isLocalHost = true;
+            SetStatuses();
+          } else {
+            url = "http://15.188.57.7:8080";
+          }
+        }
+        ImGui::PopStyleColor();
       }
-      ImGui::PopStyleColor();
-      ImGui::SameLine();
-      ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
-                            ImVec4(ImColor(250, 128, 114)));
-      if (ImGui::Button(ICON_FA_STOP " Stop Server")) {
-        connection::StartStopServer("http://15.188.57.7:8008", "/stop");
-        isServerActive = false;
+      if (isLocalHost) {
+        imguipp::center_text_ex(ICON_FA_INFO_CIRCLE "  localhost!", 230, 1,
+                                true);
+
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                              ImVec4(ImColor(0, 250, 154)));
+        if (ImGui::Button(ICON_FA_INFO_CIRCLE "go back")) {
+          url = "http://15.188.57.7:8080";
+          isLocalHost = false;
+          SetIsServerActive();
+
+          if (isServerActive) {
+            SetStatuses();
+          }
+        }
+        ImGui::PopStyleColor();
       }
-      ImGui::PopStyleColor();
-      ImGui::NewLine();
-      if (isServerActive)
-        imguipp::center_text_ex(ICON_FA_INFO_CIRCLE "  Server is running!", 230,
-                                1, true);
-      else
-        imguipp::center_text_ex(ICON_FA_INFO_CIRCLE "  Server isn't active!",
-                                230, 1, true);
-      ImGui::NewLine();
-      imguipp::center_text_ex(
-          ICON_FA_INFO_CIRCLE " Determine your server address:", 285, 1, true);
-      ImGui::PushItemWidth(240.0f);
-      /*ImGui::PushStyleColor(ImGuiCol_FrameBg,
-        ImVec4(ImColor(0, 250, 154)));*/
-      ImGui::InputTextWithHint("##input", "http://ip:port", buf, size,
-                               ImGuiInputTextFlags_CharsNoBlank);
-      /*ImGui::PopStyleColor();*/
-      ImGui::PopItemWidth();
     }
 
     if (settings::Tab == 2 && isServerActive) {
       if (ImGui::Button(ICON_FA_FILE_CODE " All logs")) {
         ClearLogs();
-        logs = connection::UpdateLogs("");
+        logs = connection::UpdateLogs("", url);
       }
       ImGui::SameLine();
       if (ImGui::Button(ICON_FA_INFO " Information")) {
         ClearLogs();
-        logs = connection::UpdateLogs("information");
+        logs = connection::UpdateLogs("information", url);
       }
       ImGui::SameLine();
       if (ImGui::Button(ICON_FA_MAP_SIGNS " Error")) {
         ClearLogs();
-        logs = connection::UpdateLogs("error");
+        logs = connection::UpdateLogs("error", url);
       }
       ImGui::SameLine();
       if (ImGui::Button(ICON_FA_MAP_PIN " Warning")) {
         ClearLogs();
-        logs = connection::UpdateLogs("warning");
+        logs = connection::UpdateLogs("warning", url);
       }
       ImGui::SameLine();
       if (ImGui::Button(ICON_FA_TRASH " Clear")) {
@@ -164,13 +185,13 @@ void myUI::RenderMenu() {
       ImGui::Text(ICON_FA_INFO_CIRCLE " Light: ");
 
       if (ImGui::Button("On##1", ImVec2(70, 0))) {
-        connection::UpdateStatus("/device?id=3", "on");
+        connection::UpdateStatus("/device?id=3", "on", url);
         menuStatuses.isLight = true;
       }
       ImGui::SameLine();
 
       if (ImGui::Button("Off##1", ImVec2(70, 0))) {
-        connection::UpdateStatus("/device?id=3", "off");
+        connection::UpdateStatus("/device?id=3", "off", url);
         menuStatuses.isLight = false;
       }
       ImGui::SameLine();
@@ -184,13 +205,13 @@ void myUI::RenderMenu() {
       ImGui::Text(ICON_FA_INFO_CIRCLE " Device: ");
 
       if (ImGui::Button("On##2", ImVec2(70, 0))) {
-        connection::UpdateStatus("/device?id=4", "on");
+        connection::UpdateStatus("/device?id=4", "on", url);
         menuStatuses.isDevice = true;
       }
       ImGui::SameLine();
 
       if (ImGui::Button("Off##2", ImVec2(70, 0))) {
-        connection::UpdateStatus("/device?id=4", "off");
+        connection::UpdateStatus("/device?id=4", "off", url);
         menuStatuses.isDevice = false;
       }
       ImGui::SameLine();
@@ -204,13 +225,13 @@ void myUI::RenderMenu() {
       ImGui::Text(ICON_FA_INFO_CIRCLE " Oven: ");
 
       if (ImGui::Button("On##3", ImVec2(70, 0))) {
-        connection::UpdateStatus("/device?id=5", "on");
+        connection::UpdateStatus("/device?id=5", "on", url);
         menuStatuses.isOven = true;
       }
       ImGui::SameLine();
 
       if (ImGui::Button("Off##3", ImVec2(70, 0))) {
-        connection::UpdateStatus("/device?id=5", "off");
+        connection::UpdateStatus("/device?id=5", "off", url);
         menuStatuses.isOven = false;
       }
       ImGui::SameLine();
@@ -224,13 +245,13 @@ void myUI::RenderMenu() {
       ImGui::Text(ICON_FA_INFO_CIRCLE " Windows: ");
 
       if (ImGui::Button("Open##1", ImVec2(70, 0))) {
-        connection::UpdateStatus("/device?id=2", "opened");
+        connection::UpdateStatus("/device?id=2", "opened", url);
         menuStatuses.isWindows = true;
       }
       ImGui::SameLine();
 
       if (ImGui::Button("Close##1", ImVec2(70, 0))) {
-        connection::UpdateStatus("/device?id=2", "closed");
+        connection::UpdateStatus("/device?id=2", "closed", url);
         menuStatuses.isWindows = false;
       }
       ImGui::SameLine();
@@ -243,13 +264,13 @@ void myUI::RenderMenu() {
       ImGui::Text(ICON_FA_INFO_CIRCLE " Tap: ");
 
       if (ImGui::Button("Open##2", ImVec2(70, 0))) {
-        connection::UpdateStatus("/device?id=6", "opened");
+        connection::UpdateStatus("/device?id=6", "opened", url);
         menuStatuses.isTap = true;
       }
       ImGui::SameLine();
 
       if (ImGui::Button("Close##2", ImVec2(70, 0))) {
-        connection::UpdateStatus("/device?id=6", "closed");
+        connection::UpdateStatus("/device?id=6", "closed", url);
         menuStatuses.isTap = false;
       }
       ImGui::SameLine();
@@ -263,13 +284,13 @@ void myUI::RenderMenu() {
       ImGui::Text(ICON_FA_INFO_CIRCLE " Garage door: ");
 
       if (ImGui::Button("Open##3", ImVec2(70, 0))) {
-        connection::UpdateStatus("/device?id=7", "opened");
+        connection::UpdateStatus("/device?id=7", "opened", url);
         menuStatuses.isGarage = true;
       }
       ImGui::SameLine();
 
       if (ImGui::Button("Close##3", ImVec2(70, 0))) {
-        connection::UpdateStatus("/device?id=7", "closed");
+        connection::UpdateStatus("/device?id=7", "closed", url);
         menuStatuses.isGarage = false;
       }
       ImGui::SameLine();
@@ -286,5 +307,8 @@ void myUI::RenderMenu() {
 }
 
 void myUI::SetStatuses() {
-  if (isServerActive) menuStatuses = connection::UpdateMenuStatuses();
+  if (isServerActive) menuStatuses = connection::UpdateMenuStatuses(url);
+}
+void myUI::SetIsServerActive() {
+  isServerActive = connection::IsServerActive(url);
 }

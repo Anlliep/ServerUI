@@ -152,19 +152,20 @@ class myUI : public UI<myUI> {
   myUI() {}
   ~myUI() = default;
   void StartUp() {}
-
   void Update();
+
   void SetMenuTheme();
   void RenderMenu();
 
   void ClearLogs() { logs.clear(); }
-  void SetIsServerActive() { isServerActive = connection::IsServerActive(); }
+  void SetIsServerActive();
   void SetStatuses();
+  std::string GetUrl() const { return url; }
 
  private:
   std::vector<std::string> logs{};
   bool isServerActive{};
-  char* buf;
-  size_t size = 30;
+  bool isLocalHost = false;
+  std::string url = "http://15.188.57.7:8080";
   connection::MenuStatuses menuStatuses;
 };

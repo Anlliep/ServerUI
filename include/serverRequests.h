@@ -29,9 +29,9 @@ struct MenuStatuses {
   bool isGarage = false;
 };
 
-std::vector<std::string> UpdateLogs(const std::string&);
-bool IsServerActive();
-void UpdateStatus(const std::string&, const std::string&);
-void StartStopServer(const std::string&, const std::string&);
-MenuStatuses UpdateMenuStatuses();
+std::vector<std::string> UpdateLogs(const std::string&, const std::string&);
+bool IsServerActive(const std::string&);
+void UpdateStatus(const std::string&, const std::string&, const std::string&);
+void StartStopServer(const std::string&);
+MenuStatuses UpdateMenuStatuses(const std::string&);
 }  // namespace connection
