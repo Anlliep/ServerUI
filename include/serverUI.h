@@ -4,6 +4,7 @@
 #include <ctime>
 #include <iostream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "../bindings/imgui_impl_glfw.h"
@@ -161,10 +162,19 @@ class myUI : public UI<myUI> {
   void SetIsServerActive();
   void SetStatuses();
 
+  void OffOn(std::string);
+  void ClosedOpen(std::string);
+
  private:
+  struct isType {
+    bool isWindows{};
+    bool isDevices{};
+    bool isLights{};
+  };
   std::vector<std::string> logs{};
   bool isServerActive{};
   bool isLocalHost = false;
   std::string url = "http://15.188.57.7:8080";
-  connection::MenuStatuses menuStatuses;
+  isType type;
+  std::unordered_map<std::string, std::string> menuStatuses;
 };

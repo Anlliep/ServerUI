@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <iostream>
+#include <unordered_map>
 #include <vector>
 
 #include "Poco/Dynamic/Var.h"
@@ -20,18 +21,10 @@ using namespace Poco::JSON;
 using namespace Poco::Dynamic;
 
 namespace connection {
-struct MenuStatuses {
-  bool isWindows = false;
-  bool isLight = false;
-  bool isDevice = false;
-  bool isOven = false;
-  bool isTap = false;
-  bool isGarage = false;
-};
-
 std::vector<std::string> UpdateLogs(const std::string&, const std::string&);
 bool IsServerActive(const std::string&);
 void UpdateStatus(const std::string&, const std::string&, const std::string&);
 void StartStopServer(const std::string&);
-MenuStatuses UpdateMenuStatuses(const std::string&);
+std::unordered_map<std::string, std::string> UpdateMenuStatuses(
+    const std::string&);
 }  // namespace connection
