@@ -18,13 +18,18 @@ std::vector<std::string> connection::UpdateLogs(const std::string& type,
   HTTPRequest request(HTTPRequest::HTTP_GET, path, HTTPMessage::HTTP_1_1);
 
   int attempts = 0;
-  while (attempts < 10) {
+  while (attempts < 3) {
     try {
       session.sendRequest(request);
       break;
     } catch (const std::exception& ex) {
       std::cout << ex.what() << std::endl;
       ++attempts;
+      if(attempts == 3) {
+        std::vector<std::string> temp;
+        temp.push_back("Error. 504 Gateway Timeout.");
+        return temp;
+      }
     }
   }
 
@@ -59,20 +64,20 @@ bool connection::IsServerActive(const std::string& url) {
   }
 }
 
-void connection::UpdateStatus(const std::string& name, const std::string& state,
+void connection::UpdateStatus(const std::string& id, const std::string& state,
                               const std::string& url) {
   URI uri(url);
   HTTPClientSession session(uri.getHost(), uri.getPort());
 
   session.setKeepAliveTimeout(true);
-  HTTPRequest request(HTTPRequest::HTTP_PUT, name, HTTPMessage::HTTP_1_1);
+  HTTPRequest request(HTTPRequest::HTTP_PUT, id, HTTPMessage::HTTP_1_1);
 
   std::string status = "{\"status\" : \"" + state + "\"}";
 
   request.setContentLength(status.length());
 
   int attempts = 0;
-  while (attempts < 10) {
+  while (attempts < 3) {
     try {
       std::ostream& os = session.sendRequest(request);
       os << status;
@@ -82,11 +87,6 @@ void connection::UpdateStatus(const std::string& name, const std::string& state,
       ++attempts;
     }
   }
-
-  HTTPResponse response;
-  if (response.getStatus() != 200) {
-    throw std::exception("bad response");
-  }
 }
 
 void connection::StartStopServer(const std::string& action) {
@@ -95,26 +95,24 @@ void connection::StartStopServer(const std::string& action) {
 
   session.setKeepAliveTimeout(true);
   HTTPRequest request(HTTPRequest::HTTP_GET, action, HTTPMessage::HTTP_1_1);
-  session.sendRequest(request);
 
-  HTTPResponse response;
-  if (response.getStatus() != 200) {
-    throw std::exception("bad response");
+  try {
+    session.sendRequest(request);
+  } catch (const std::exception& ex) {
+    std::cout << ex.what() << std::endl;
   }
 }
 
-std::unordered_map<std::string, std::string> connection::UpdateMenuStatuses(
+std::vector<connection::Devices> connection::UpdateMenuStatuses(
     const std::string& url) {
   URI uri(url);
   HTTPClientSession session(uri.getHost(), uri.getPort());
 
-  std::string path = "/device";
-
   session.setKeepAliveTimeout(true);
-  HTTPRequest request(HTTPRequest::HTTP_GET, path, HTTPMessage::HTTP_1_1);
+  HTTPRequest request(HTTPRequest::HTTP_GET, "/device", HTTPMessage::HTTP_1_1);
 
   int attempts = 0;
-  while (attempts < 10) {
+  while (attempts < 3) {
     try {
       session.sendRequest(request);
       break;
@@ -127,19 +125,22 @@ std::unordered_map<std::string, std::string> connection::UpdateMenuStatuses(
   HTTPResponse response;
   std::istream& page = session.receiveResponse(response);
 
-  std::unordered_map<std::string, std::string> devices;
   Parser parser;
-  Var name = parser.parse(page);
-  Var status;
-  Poco::JSON::Array::Ptr arr = name.extract<Poco::JSON::Array::Ptr>();
+  Var result = parser.parse(page);
+  Poco::JSON::Array::Ptr arr = result.extract<Poco::JSON::Array::Ptr>();
 
-  Object::Ptr object;
+  std::vector<connection::Devices> devices;
 
   for (int i = 0; i < arr->size(); i++) {
-    object = arr->getObject(i);
-    name = object->get("name");
-    status = object->get("status");
-    devices.insert(std::make_pair(name.toString(), status.toString()));
+    Object::Ptr object = arr->getObject(i);
+    connection::Devices temp;
+    temp.floor = object->getValue<std::string>("floor");
+    temp.id = object->getValue<std::string>("id");
+    temp.name = object->getValue<std::string>("name");
+    temp.room = object->getValue<std::string>("room");
+    temp.status = object->getValue<std::string>("status");
+    temp.type = object->getValue<std::string>("type");
+    devices.push_back(temp);
   }
   return devices;
 }

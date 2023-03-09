@@ -21,10 +21,18 @@ using namespace Poco::JSON;
 using namespace Poco::Dynamic;
 
 namespace connection {
+struct Devices {
+  std::string floor;
+  std::string id;
+  std::string name;
+  std::string room;
+  std::string status;
+  std::string type;
+};
+
 std::vector<std::string> UpdateLogs(const std::string&, const std::string&);
 bool IsServerActive(const std::string&);
 void UpdateStatus(const std::string&, const std::string&, const std::string&);
 void StartStopServer(const std::string&);
-std::unordered_map<std::string, std::string> UpdateMenuStatuses(
-    const std::string&);
+std::vector<Devices> UpdateMenuStatuses(const std::string&);
 }  // namespace connection

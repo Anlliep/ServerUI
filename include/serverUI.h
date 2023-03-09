@@ -156,14 +156,18 @@ class myUI : public UI<myUI> {
   void Update();
 
   void SetMenuTheme();
+
+  void RenderLeftSide();
+  void RenderRightSide();
+  void RenderRunServer();
+  void RenderLogs();
   void RenderMenu();
 
   void ClearLogs() { logs.clear(); }
   void SetIsServerActive();
   void SetStatuses();
-
-  void OffOn(std::string);
-  void ClosedOpen(std::string);
+  void ClosedOpen(int id);
+  void OffOn(int id);
 
  private:
   struct isType {
@@ -171,10 +175,11 @@ class myUI : public UI<myUI> {
     bool isDevices{};
     bool isLights{};
   };
+
+  isType type;
   std::vector<std::string> logs{};
   bool isServerActive{};
   bool isLocalHost = false;
   std::string url = "http://15.188.57.7:8080";
-  isType type;
-  std::unordered_map<std::string, std::string> menuStatuses;
+  std::vector<connection::Devices> devices{};
 };
